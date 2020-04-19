@@ -6,10 +6,17 @@
 <body>
 
     <script>
-    var config = {
+    let config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
+        backgroundColor: "#fff",
+        physics: {
+            default: "arcade",
+            arcade: {
+                debug: false
+            }
+        },
         scene: {
             preload: preload,
             create: create,
@@ -17,14 +24,18 @@
         }
     };
 
-    var game = new Phaser.Game(config);
+    let game = new Phaser.Game(config);
 
     function preload() {
-        this.load.image("tank", "sprites/tank-1.png");
+        this.load.image("tank", "./sprites/tank-1.png");
     }
 
-    function create() {
+    let walls;
 
+    function create() {
+        this.add.image(400, 300, "tank");
+
+        walls.physics.add.staticGroup();
     }
 
     function update() {
