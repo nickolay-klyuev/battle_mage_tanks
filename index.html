@@ -28,18 +28,47 @@
 
     function preload() {
         this.load.image("tank", "./sprites/tank-1.png");
+        this.load.image("block", "./sprites/black_block.png");
     }
 
     let walls;
+    let tank;
+    let move;
+    let moveSpeed = 50;
 
     function create() {
-        this.add.image(400, 300, "tank");
+        tank = this.physics.add.sprite(400, 300, "tank");
+        move = this.input.keyboard.createCursorKeys();
 
-        walls.physics.add.staticGroup();
+        walls = this.physics.add.staticGroup();
+        walls.create(16, 16, "block");
+        walls.create(48, 16, "block");
+        walls.create(16, 48, "block");
+        walls.create(100, 100, "block").setScale(2).refreshBody();
+        walls.create(132, 132, "block");
+        walls.create(164, 164, "block");
+        walls.create(200, 200, "block");
+        walls.create(232, 200, "block");
+        walls.create(264, 200, "block");
     }
 
     function update() {
+        tank.setVelocityX(0);
+        tank.setVelocityY(0);
+        let isDown = move.down.isDown;
+        let isUp = move.up.isDown;
+        let isLeft = move.left.isDown;
+        let isRight = move.right.isDown;
 
+        if (isLeft && (!isDown && !isUp && !isRight)) {
+            tank.setVelocityX(0 - moveSpeed);
+        } else if (isRight && (!isDown && !isUp)) {
+            tank.setVelocityX(moveSpeed);
+        } else if (isUp && !isDown) {
+            tank.setVelocityY(0 - moveSpeed);
+        } else if (isDown) {
+            tank.setVelocityY(moveSpeed);
+        };
     }
     </script>
 
