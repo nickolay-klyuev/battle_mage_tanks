@@ -27,14 +27,14 @@
     let game = new Phaser.Game(config);
 
     function preload() {
-        this.load.image("tank", "./sprites/tank-1.png");
+        this.load.spritesheet("tank", "./sprites/tank-1-sprite.png", {frameWidth: 32, frameHeight: 32});
         this.load.image("block", "./sprites/black_block.png");
     }
 
     let walls;
     let tank;
     let move;
-    let moveSpeed = 50;
+    let moveSpeed = 100;
 
     function create() {
         tank = this.physics.add.sprite(400, 300, "tank");
@@ -50,25 +50,58 @@
         walls.create(200, 200, "block");
         walls.create(232, 200, "block");
         walls.create(264, 200, "block");
+
+        this.anims.create({
+            key: 'move',
+            frames: this.anims.generateFrameNumbers('tank', { start: 0, end: 4 }),
+            frameRate: 10,
+            repeat: -1
+        });
     }
 
     function update() {
-        tank.setVelocityX(0);
-        tank.setVelocityY(0);
+
         let isDown = move.down.isDown;
         let isUp = move.up.isDown;
         let isLeft = move.left.isDown;
         let isRight = move.right.isDown;
+        let isNoOne = !isDown && !isUp && !isLeft && !isRight;
+        let isOnlyDown = isDown && !isUp && !isLeft && !isRight;
+        let isOnlyUp = isUp && !isDown && !isLeft && !isRight;
+        let isOnlyLeft = isLeft && !isUp && !isDown && !isRight;
+        let isOnlyRight = isRight && !isUp && !isLeft && !isDown;
 
-        if (isLeft && (!isDown && !isUp && !isRight)) {
-            tank.setVelocityX(0 - moveSpeed);
-        } else if (isRight && (!isDown && !isUp)) {
-            tank.setVelocityX(moveSpeed);
-        } else if (isUp && !isDown) {
-            tank.setVelocityY(0 - moveSpeed);
-        } else if (isDown) {
-            tank.setVelocityY(moveSpeed);
-        };
+        if (isNoOne) {
+            tank.anims.stop("move");
+            tank.setVelocityX(0);
+            tank.setVelocityY(0);
+        }
+
+        if (isOnlyDown || isOnlyUp || isOnlyLeft || isOnlyRight) {
+            tank.setVelocityX(0);
+            tank.setVelocityY(0);
+
+            if (isLeft) {
+                tank.setVelocityX(0 - moveSpeed);
+                tank.anims.play("move", true);
+                tank.angle = 270;
+            }
+            if (isRight) {
+                tank.setVelocityX(moveSpeed);
+                tank.anims.play("move", true);
+                tank.angle = 90;
+            }
+            if (isUp) {
+                tank.setVelocityY(0 - moveSpeed);
+                tank.anims.play("move", true);
+                tank.angle = 0;
+            }
+            if (isDown) {
+                tank.setVelocityY(moveSpeed);
+                tank.anims.play("move", true);
+                tank.angle = 180;
+            }
+        }
     }
     </script>
 
