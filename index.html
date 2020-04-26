@@ -38,14 +38,17 @@
     let move;
     let spacebar;
     let moveSpeed = 100;
+    let playerMoveSpeed = 200;
     let fireSpeed = 300;
 
     function create() {
         tank = this.physics.add.sprite(400, 300, "tank");
+        tank.setCollideWorldBounds(true);
         enemies = this.physics.add.group({
             key: "enemy",
             repeat: 5,
-            setXY: {x: 100, y: 400, stepX: 50}
+            setXY: {x: 100, y: 400, stepX: 50},
+            collideWorldBounds: true
         });
         move = this.input.keyboard.createCursorKeys();
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -74,9 +77,9 @@
         });
     }
 
-    function fire(tank, that, isEnemy = false) {
-        let fireball = that.physics.add.image(tank.x, tank.y, "fireball");
-        fireball.angle = tank.angle;
+    function fire(shooter, that, isEnemy = false) {
+        let fireball = that.physics.add.image(shooter.x, shooter.y, "fireball");
+        fireball.angle = shooter.angle;
         let fireDir = fireball.angle;
         if (fireDir == 0) fireball.setVelocityY(0 - fireSpeed);
         if (fireDir == 90) fireball.setVelocityX(fireSpeed);
@@ -94,6 +97,11 @@
                 fireball.destroy();
                 enemy.destroy();
             }
+        } else {
+            that.physics.add.collider(fireball, tank, () => {
+                fireball.destroy();
+                tank.destroy();
+            }, null, that);
         }
     }
 
@@ -146,19 +154,19 @@
             tank.anims.play("move", true);
 
             if (isLeft) {
-                tank.setVelocityX(0 - moveSpeed);
+                tank.setVelocityX(0 - playerMoveSpeed);
                 tank.angle = 270;
             }
             if (isRight) {
-                tank.setVelocityX(moveSpeed);
+                tank.setVelocityX(playerMoveSpeed);
                 tank.angle = 90;
             }
             if (isUp) {
-                tank.setVelocityY(0 - moveSpeed);
+                tank.setVelocityY(0 - playerMoveSpeed);
                 tank.angle = 0;
             }
             if (isDown) {
-                tank.setVelocityY(moveSpeed);
+                tank.setVelocityY(playerMoveSpeed);
                 tank.angle = 180;
             }
         }
