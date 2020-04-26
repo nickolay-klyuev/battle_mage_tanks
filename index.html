@@ -45,7 +45,7 @@
         enemies = this.physics.add.staticGroup({
             key: "enemy",
             repeat: 5,
-            setXY: {x: 100, y: 20, stepX: 50}
+            setXY: {x: 100, y: 400, stepX: 50}
         });
         move = this.input.keyboard.createCursorKeys();
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -72,6 +72,29 @@
         });
     }
 
+    function fire(tank, that, isEnemy = false) {
+        let fireball = that.physics.add.image(tank.x, tank.y, "fireball");
+        fireball.angle = tank.angle;
+        let fireDir = fireball.angle;
+        if (fireDir == 0) fireball.setVelocityY(0 - fireSpeed);
+        if (fireDir == 90) fireball.setVelocityX(fireSpeed);
+        if (fireDir == -180) fireball.setVelocityY(fireSpeed);
+        if (fireDir == -90) fireball.setVelocityX(0 - fireSpeed);
+
+        that.physics.add.collider(fireball, walls, hitWall, null, that);
+        function hitWall(fireball, wall) {
+            fireball.destroy();
+        }
+
+        if (!isEnemy) {
+            that.physics.add.collider(fireball, enemies, hitEnemy, null, that);
+            function hitEnemy(fireball, enemy) {
+                fireball.destroy();
+                enemy.destroy();
+            }
+        }
+    }
+
     function update() {
 
         let isDown = move.down.isDown;
@@ -84,25 +107,12 @@
         let isOnlyLeft = isLeft && !isUp && !isDown && !isRight;
         let isOnlyRight = isRight && !isUp && !isLeft && !isDown;
 
+        enemies.getChildren().forEach((enemy) => {
+            if (Math.random() <= 0.01) fire(enemy, this, true);
+        });
+
         if (Phaser.Input.Keyboard.JustDown(spacebar)) {
-            let fireball = this.physics.add.image(tank.x, tank.y, "fireball");
-            fireball.angle = tank.angle;
-            let fireDir = fireball.angle;
-            if (fireDir == 0) fireball.setVelocityY(0 - fireSpeed);
-            if (fireDir == 90) fireball.setVelocityX(fireSpeed);
-            if (fireDir == -180) fireball.setVelocityY(fireSpeed);
-            if (fireDir == -90) fireball.setVelocityX(0 - fireSpeed);
-
-            this.physics.add.collider(fireball, walls, hitWall, null, this);
-            function hitWall(fireball, wall) {
-                fireball.destroy();
-            }
-
-            this.physics.add.collider(fireball, enemies, hitEnemy, null, this);
-            function hitEnemy(fireball, enemy) {
-                fireball.destroy();
-                enemy.destroy();
-            }
+            fire(tank, this);
         }
 
         if (isNoOne) {
