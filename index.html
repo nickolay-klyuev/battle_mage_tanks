@@ -37,9 +37,11 @@
     let tank;
     let move;
     let spacebar;
+    let enter;
     let moveSpeed = 100;
     let playerMoveSpeed = 200;
     let fireSpeed = 300;
+    let gameOver = false;
 
     function create() {
         tank = this.physics.add.sprite(400, 300, "tank");
@@ -52,6 +54,7 @@
         });
         move = this.input.keyboard.createCursorKeys();
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
         walls = this.physics.add.staticGroup();
         walls.create(16, 16, "block");
@@ -99,6 +102,7 @@
             }
         } else {
             that.physics.add.collider(fireball, tank, () => {
+                gameOver = true;
                 fireball.destroy();
                 tank.destroy();
             }, null, that);
@@ -106,68 +110,85 @@
     }
 
     function update() {
+        let isSpace = Phaser.Input.Keyboard.JustDown(spacebar);
+        let isEnter = Phaser.Input.Keyboard.JustDown(enter);
 
-        let isDown = move.down.isDown;
-        let isUp = move.up.isDown;
-        let isLeft = move.left.isDown;
-        let isRight = move.right.isDown;
-        let isNoOne = !isDown && !isUp && !isLeft && !isRight;
-        let isOnlyDown = isDown && !isUp && !isLeft && !isRight;
-        let isOnlyUp = isUp && !isDown && !isLeft && !isRight;
-        let isOnlyLeft = isLeft && !isUp && !isDown && !isRight;
-        let isOnlyRight = isRight && !isUp && !isLeft && !isDown;
+        if (gameOver) {
+            this.add.text(180, 250, 'Game Over', { fontSize: '15px', fill: '#000000' });
+            this.add.text(152, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' });
+            this.physics.pause();
+            if (isEnter) {
+                gameOver = false;
+                this.scene.restart();
+            }
+        } else if (enemies.getChildren().length == 0) {
+            this.add.text(180, 250, 'You are winner', { fontSize: '20px', fill: '#000000' });
+            this.add.text(152, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' });
+            this.physics.pause();
+            if (isEnter) this.scene.restart();
+        } else {
+            let isDown = move.down.isDown;
+            let isUp = move.up.isDown;
+            let isLeft = move.left.isDown;
+            let isRight = move.right.isDown;
+            let isNoOne = !isDown && !isUp && !isLeft && !isRight;
+            let isOnlyDown = isDown && !isUp && !isLeft && !isRight;
+            let isOnlyUp = isUp && !isDown && !isLeft && !isRight;
+            let isOnlyLeft = isLeft && !isUp && !isDown && !isRight;
+            let isOnlyRight = isRight && !isUp && !isLeft && !isDown;
 
-        enemies.getChildren().forEach((enemy) => {
-            if (Math.random() <= 0.01) fire(enemy, this, true);
-            if (Math.random() <= 0.1) {
-                let r = Math.random();
-                enemy.setVelocity(0, 0);
-                if (r <= 0.25) {
-                    enemy.angle = 90;
-                    enemy.setVelocityX(moveSpeed);
-                } else if (r > 0.25 && r <= 0.5) {
-                    enemy.angle = 270;
-                    enemy.setVelocityX(0 - moveSpeed);
-                } else if (r > 0.5 && r <= 0.75) {
-                    enemy.angle = 180;
-                    enemy.setVelocityY(moveSpeed);
-                } else {
-                    enemy.angle = 0;
-                    enemy.setVelocityY(0 - moveSpeed);
+            enemies.getChildren().forEach((enemy) => {
+                if (Math.random() <= 0.01) fire(enemy, this, true);
+                if (Math.random() <= 0.1) {
+                    let r = Math.random();
+                    enemy.setVelocity(0, 0);
+                    if (r <= 0.25) {
+                        enemy.angle = 90;
+                        enemy.setVelocityX(moveSpeed);
+                    } else if (r > 0.25 && r <= 0.5) {
+                        enemy.angle = 270;
+                        enemy.setVelocityX(0 - moveSpeed);
+                    } else if (r > 0.5 && r <= 0.75) {
+                        enemy.angle = 180;
+                        enemy.setVelocityY(moveSpeed);
+                    } else {
+                        enemy.angle = 0;
+                        enemy.setVelocityY(0 - moveSpeed);
+                    }
                 }
-            }
-        });
+            });
 
-        if (Phaser.Input.Keyboard.JustDown(spacebar)) {
-            fire(tank, this);
-        }
-
-        if (isNoOne) {
-            tank.anims.stop("move");
-            tank.setVelocityX(0);
-            tank.setVelocityY(0);
-        }
-
-        if (isOnlyDown || isOnlyUp || isOnlyLeft || isOnlyRight) {
-            tank.setVelocityX(0);
-            tank.setVelocityY(0);
-            tank.anims.play("move", true);
-
-            if (isLeft) {
-                tank.setVelocityX(0 - playerMoveSpeed);
-                tank.angle = 270;
+            if (isSpace) {
+                fire(tank, this);
             }
-            if (isRight) {
-                tank.setVelocityX(playerMoveSpeed);
-                tank.angle = 90;
+
+            if (isNoOne) {
+                tank.anims.stop("move");
+                tank.setVelocityX(0);
+                tank.setVelocityY(0);
             }
-            if (isUp) {
-                tank.setVelocityY(0 - playerMoveSpeed);
-                tank.angle = 0;
-            }
-            if (isDown) {
-                tank.setVelocityY(playerMoveSpeed);
-                tank.angle = 180;
+
+            if (isOnlyDown || isOnlyUp || isOnlyLeft || isOnlyRight) {
+                tank.setVelocityX(0);
+                tank.setVelocityY(0);
+                tank.anims.play("move", true);
+
+                if (isLeft) {
+                    tank.setVelocityX(0 - playerMoveSpeed);
+                    tank.angle = 270;
+                }
+                if (isRight) {
+                    tank.setVelocityX(playerMoveSpeed);
+                    tank.angle = 90;
+                }
+                if (isUp) {
+                    tank.setVelocityY(0 - playerMoveSpeed);
+                    tank.angle = 0;
+                }
+                if (isDown) {
+                    tank.setVelocityY(playerMoveSpeed);
+                    tank.angle = 180;
+                }
             }
         }
     }
