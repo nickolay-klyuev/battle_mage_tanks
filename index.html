@@ -42,7 +42,7 @@
 
     function create() {
         tank = this.physics.add.sprite(400, 300, "tank");
-        enemies = this.physics.add.staticGroup({
+        enemies = this.physics.add.group({
             key: "enemy",
             repeat: 5,
             setXY: {x: 100, y: 400, stepX: 50}
@@ -62,6 +62,8 @@
         walls.create(264, 200, "block");
 
         this.physics.add.collider(tank, walls);
+        this.physics.add.collider(enemies, walls);
+        this.physics.add.collider(enemies, enemies);
         this.physics.add.collider(tank, enemies);
 
         this.anims.create({
@@ -109,6 +111,23 @@
 
         enemies.getChildren().forEach((enemy) => {
             if (Math.random() <= 0.01) fire(enemy, this, true);
+            if (Math.random() <= 0.1) {
+                let r = Math.random();
+                enemy.setVelocity(0, 0);
+                if (r <= 0.25) {
+                    enemy.angle = 90;
+                    enemy.setVelocityX(moveSpeed);
+                } else if (r > 0.25 && r <= 0.5) {
+                    enemy.angle = 270;
+                    enemy.setVelocityX(0 - moveSpeed);
+                } else if (r > 0.5 && r <= 0.75) {
+                    enemy.angle = 180;
+                    enemy.setVelocityY(moveSpeed);
+                } else {
+                    enemy.angle = 0;
+                    enemy.setVelocityY(0 - moveSpeed);
+                }
+            }
         });
 
         if (Phaser.Input.Keyboard.JustDown(spacebar)) {
