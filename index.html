@@ -2,7 +2,6 @@
 <html>
 <head>
     <script src="./scripts/phaser.js"></script>
-    <script src="./scripts/data.js"></script>
     <script src="./scripts/fire.js"></script>
 </head>
 <body>
@@ -28,6 +27,26 @@
 
     let game = new Phaser.Game(config);
 
+    let walls;
+    let tank;
+    let move;
+    let spacebar;
+    let enter;
+    let moveSpeed = 100;
+    let playerMoveSpeed = 200;
+    let fireSpeed = 300;
+    let gameOver = false;
+    let hpValue = 100;
+    let hpText;
+    let hpBar;
+    let hpWidth = 30;
+    let enemies;
+    let enemiesHpBars = [];
+
+    let simpleEnemy = {
+        damage: 20
+    }
+
     function preload() {
         this.load.spritesheet("tank", "./sprites/tank-sprite.png", {frameWidth: 26, frameHeight: 32});
         this.load.image("block", "./sprites/black_block.png");
@@ -37,6 +56,7 @@
 
     function create() {
         tank = this.physics.add.sprite(400, 300, "tank");
+        hpBar = this.add.line(tank.x, tank.y, 0, 20, hpWidth, 20, "0x1f8f00");
         tank.setCollideWorldBounds(true);
         enemies = this.physics.add.group({
             key: "enemy",
@@ -44,6 +64,11 @@
             setXY: {x: 100, y: 400, stepX: 50},
             collideWorldBounds: true
         });
+        enemies.getChildren().forEach((enemy, i) => {
+            enemiesHpBars[i] = this.add.line(enemy.x, enemy.y, 0, 20, hpWidth, 20, "0x870000");
+        });
+        console.log(enemiesHpBars);
+
         move = this.input.keyboard.createCursorKeys();
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
@@ -81,10 +106,14 @@
         if (hpValue <= 0) gameOver = true;
 
         hpText.text = `Hp: ${hpValue}`;
+        hpBar.x = tank.x;
+        hpBar.y = tank.y;
+        hpBar.displayWidth = (hpValue * hpWidth) / 100;
 
         if (gameOver) {
             this.add.text(180, 250, 'Game Over', { fontSize: '15px', fill: '#000000' });
             this.add.text(152, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' });
+            hpBar.destroy();
             tank.destroy();
             this.physics.pause();
             if (isEnter) {

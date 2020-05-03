@@ -20,9 +20,9 @@ function fire(shooter, that, isEnemy = false) {
         }
     } else {
         that.physics.add.collider(fireball, tank, () => {
-            let damage = simpleEnemy.damage + (Math.random() * 5);
-            if (Math.random() <= 0.5) damage *= -1;
-            hpValue -= damage;
+            let randomDamage = Math.round(Math.random() * 5);
+            if (Math.random() <= 0.5) randomDamage *= -1;
+            hpValue -= simpleEnemy.damage + randomDamage;
             fireball.destroy();
         }, null, that);
     }
