@@ -3,6 +3,14 @@
 <head>
     <script src="./scripts/phaser.js"></script>
     <script src="./scripts/fire.js"></script>
+    <style>
+        body {
+            text-align: center;
+        }
+        canvas {
+            display: inline-block;
+        }
+    </style>
 </head>
 <body>
 
@@ -11,7 +19,7 @@
         type: Phaser.AUTO,
         width: 800,
         height: 600,
-        backgroundColor: "#fff",
+        backgroundColor: "#72edd0",
         physics: {
             default: "arcade",
             arcade: {
@@ -55,7 +63,13 @@
     }
 
     function create() {
-        tank = this.physics.add.sprite(400, 300, "tank");
+        tank = this.physics.add.sprite(387, 1600, "tank");
+
+        //camera
+        this.cameras.main.setBounds(0, 0, 800, 600 * 3);
+        this.cameras.main.startFollow(tank, true);
+        this.physics.world.setBounds(0, 0, 800, 600 * 3);
+
         hpBar = this.add.line(tank.x, tank.y, 0, 20, hpWidth, 20, "0x1f8f00");
         tank.setCollideWorldBounds(true);
         enemies = this.physics.add.group({
@@ -79,7 +93,6 @@
         walls.create(16, 16, "block");
         walls.create(48, 16, "block");
         walls.create(16, 48, "block");
-        walls.create(100, 100, "block").setScale(2).refreshBody();
         walls.create(132, 132, "block");
         walls.create(164, 164, "block");
         walls.create(200, 200, "block");
