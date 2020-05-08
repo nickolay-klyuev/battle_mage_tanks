@@ -34,6 +34,7 @@
     let enter;
     let moveSpeed = 100;
     let playerMoveSpeed = 200;
+    let playerDamage = 30;
     let fireSpeed = 300;
     let gameOver = false;
     let hpValue = 100;
@@ -41,7 +42,6 @@
     let hpBar;
     let hpWidth = 30;
     let enemies;
-    let enemiesHpBars = [];
 
     let simpleEnemy = {
         damage: 20
@@ -65,9 +65,9 @@
             collideWorldBounds: true
         });
         enemies.getChildren().forEach((enemy, i) => {
-            enemiesHpBars[i] = this.add.line(enemy.x, enemy.y, 0, 20, hpWidth, 20, "0x870000");
+            enemy.hpBar = this.add.line(enemy.x, enemy.y, 0, 20, hpWidth, 20, "0x870000");
+            enemy.hpValue = 100;
         });
-        console.log(enemiesHpBars);
 
         move = this.input.keyboard.createCursorKeys();
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -109,6 +109,16 @@
         hpBar.x = tank.x;
         hpBar.y = tank.y;
         hpBar.displayWidth = (hpValue * hpWidth) / 100;
+
+        enemies.getChildren().forEach((enemy) => {
+            enemy.hpBar.x = enemy.x;
+            enemy.hpBar.y = enemy.y;
+            enemy.hpBar.displayWidth = (enemy.hpValue * hpWidth) / 100;
+            if (enemy.hpValue <= 0) {
+                enemy.hpBar.destroy();
+                enemy.destroy();
+            }
+        });
 
         if (gameOver) {
             this.add.text(180, 250, 'Game Over', { fontSize: '15px', fill: '#000000' });

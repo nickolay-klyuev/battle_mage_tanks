@@ -12,16 +12,15 @@ function fire(shooter, that, isEnemy = false) {
         fireball.destroy();
     }
 
+    let randomDamage = Math.round(Math.random() * 5);
+    if (Math.random() <= 0.5) randomDamage *= -1;
     if (!isEnemy) {
-        that.physics.add.collider(fireball, enemies, hitEnemy, null, that);
-        function hitEnemy(fireball, enemy) {
+        that.physics.add.collider(fireball, enemies, (fireball, enemy) => {
+            enemy.hpValue -= playerDamage + randomDamage;
             fireball.destroy();
-            enemy.destroy();
-        }
+        }, null, that);
     } else {
         that.physics.add.collider(fireball, tank, () => {
-            let randomDamage = Math.round(Math.random() * 5);
-            if (Math.random() <= 0.5) randomDamage *= -1;
             hpValue -= simpleEnemy.damage + randomDamage;
             fireball.destroy();
         }, null, that);
