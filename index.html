@@ -51,19 +51,25 @@
     let hpWidth = 30;
     let enemies;
 
+    let button_1;
+
     let simpleEnemy = {
         damage: 20
     }
 
     function preload() {
         this.load.spritesheet("tank", "./sprites/tank-sprite.png", {frameWidth: 26, frameHeight: 32});
-        this.load.image("block", "./sprites/black_block.png");
+        this.load.image("350_32_block", "./sprites/350_32_block.png");
+        this.load.image("400_32_block", "./sprites/400_32_block.png");
+        this.load.image("50_32_block_1", "./sprites/50_32_block_1.png");
+        this.load.image("32_184_block_2", "./sprites/32_184_block_2.png");
+        this.load.image("button_1", "./sprites/button_1.png");
         this.load.image("enemy", "./sprites/enemy.png");
         this.load.image("fireball", "./sprites/fireball.png");
     }
 
     function create() {
-        tank = this.physics.add.sprite(387, 1600, "tank");
+        tank = this.physics.add.sprite(100, 1700, "tank");
 
         //camera
         this.cameras.main.setBounds(0, 0, 800, 600 * 3);
@@ -87,17 +93,15 @@
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
-        hpText = this.add.text(700, 500, `Hp: ${hpValue}`, { fontSize: '15px', fill: '#000000' });
+        hpText = this.add.text(700, 550, `Hp: ${hpValue}`, { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
+
+        button_1 = this.physics.add.sprite(350, 1700, "button_1");
 
         walls = this.physics.add.staticGroup();
-        walls.create(16, 16, "block");
-        walls.create(48, 16, "block");
-        walls.create(16, 48, "block");
-        walls.create(132, 132, "block");
-        walls.create(164, 164, "block");
-        walls.create(200, 200, "block");
-        walls.create(232, 200, "block");
-        walls.create(264, 200, "block");
+        walls.create(175, 1600, "350_32_block");
+        walls.create(600, 1600, "400_32_block");
+        walls.create(375, 1600, "50_32_block_1");
+        walls.create(450, 1708, "32_184_block_2");
 
         this.physics.add.collider(tank, walls);
         this.physics.add.collider(enemies, walls);
@@ -134,8 +138,8 @@
         });
 
         if (gameOver) {
-            this.add.text(180, 250, 'Game Over', { fontSize: '15px', fill: '#000000' });
-            this.add.text(152, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' });
+            this.add.text(300, 250, 'Game Over', { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
+            this.add.text(300, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
             hpBar.destroy();
             tank.destroy();
             this.physics.pause();
@@ -145,8 +149,8 @@
                 this.scene.restart();
             }
         } else if (enemies.getChildren().length == 0) {
-            this.add.text(180, 250, 'You are winner', { fontSize: '20px', fill: '#000000' });
-            this.add.text(152, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' });
+            this.add.text(300, 250, 'You are winner', { fontSize: '20px', fill: '#000000' }).setScrollFactor(0);
+            this.add.text(300, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
             this.physics.pause();
             if (isEnter) this.scene.restart();
         } else {
