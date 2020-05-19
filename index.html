@@ -3,6 +3,7 @@
 <head>
     <script src="./scripts/phaser.js"></script>
     <script src="./scripts/fire.js"></script>
+    <script src="./scripts/buttonsCollider.js"></script>
     <style>
         body {
             text-align: center;
@@ -51,8 +52,6 @@
     let hpWidth = 30;
     let enemies;
 
-    let button_1;
-
     let simpleEnemy = {
         damage: 20
     }
@@ -61,9 +60,17 @@
         this.load.spritesheet("tank", "./sprites/tank-sprite.png", {frameWidth: 26, frameHeight: 32});
         this.load.image("350_32_block", "./sprites/350_32_block.png");
         this.load.image("400_32_block", "./sprites/400_32_block.png");
+        this.load.image("32_184_block", "./sprites/32_184_block.png");
+        this.load.image("750_32_block", "./sprites/750_32_block.png");
         this.load.image("50_32_block_1", "./sprites/50_32_block_1.png");
         this.load.image("32_184_block_2", "./sprites/32_184_block_2.png");
+        this.load.image("50_32_block_3", "./sprites/50_32_block_3.png");
         this.load.image("button_1", "./sprites/button_1.png");
+        this.load.image("button_1_active", "./sprites/button_1_active.png");
+        this.load.image("button_2", "./sprites/button_2.png");
+        this.load.image("button_2_active", "./sprites/button_2_active.png");
+        this.load.image("button_3", "./sprites/button_3.png");
+        this.load.image("button_3_active", "./sprites/button_3_active.png");
         this.load.image("enemy", "./sprites/enemy.png");
         this.load.image("fireball", "./sprites/fireball.png");
     }
@@ -95,18 +102,28 @@
 
         hpText = this.add.text(700, 550, `Hp: ${hpValue}`, { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
 
-        button_1 = this.physics.add.sprite(350, 1700, "button_1");
+        //buttons
+        let button_1 = this.physics.add.sprite(350, 1700, "button_1");
+        let button_2 = this.physics.add.sprite(700, 1500, "button_2");
+        let button_3 = this.physics.add.sprite(700, 1700, "button_3");
 
+        //walls
         walls = this.physics.add.staticGroup();
         walls.create(175, 1600, "350_32_block");
         walls.create(600, 1600, "400_32_block");
+        walls.create(600, 1500, "32_184_block");
+        walls.create(425, 1300, "750_32_block");
         walls.create(375, 1600, "50_32_block_1");
         walls.create(450, 1708, "32_184_block_2");
+        walls.create(25, 1300, "50_32_block_3");
 
         this.physics.add.collider(tank, walls);
         this.physics.add.collider(enemies, walls);
         this.physics.add.collider(enemies, enemies);
         this.physics.add.collider(tank, enemies);
+        this.physics.add.collider(tank, button_1, (tank, btn) => { buttonsCollider(tank, btn, "button_1_active", "block_1", this); });
+        this.physics.add.collider(tank, button_2, (tank, btn) => { buttonsCollider(tank, btn, "button_2_active", "block_2", this); });
+        this.physics.add.collider(tank, button_3, (tank, btn) => { buttonsCollider(tank, btn, "button_3_active", "block_3", this); });
 
         this.anims.create({
             key: 'move',
