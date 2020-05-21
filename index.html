@@ -65,12 +65,15 @@
         this.load.image("50_32_block_1", "./sprites/50_32_block_1.png");
         this.load.image("32_184_block_2", "./sprites/32_184_block_2.png");
         this.load.image("50_32_block_3", "./sprites/50_32_block_3.png");
+        this.load.image("268_32_block_4", "./sprites/268_32_block_4.png");
         this.load.image("button_1", "./sprites/button_1.png");
         this.load.image("button_1_active", "./sprites/button_1_active.png");
         this.load.image("button_2", "./sprites/button_2.png");
         this.load.image("button_2_active", "./sprites/button_2_active.png");
         this.load.image("button_3", "./sprites/button_3.png");
         this.load.image("button_3_active", "./sprites/button_3_active.png");
+        this.load.image("button_4", "./sprites/button_4.png");
+        this.load.image("button_4_active", "./sprites/button_4_active.png");
         this.load.image("enemy", "./sprites/enemy.png");
         this.load.image("fireball", "./sprites/fireball.png");
     }
@@ -79,18 +82,29 @@
         tank = this.physics.add.sprite(100, 1700, "tank");
 
         //camera
-        this.cameras.main.setBounds(0, 0, 800, 600 * 3);
+        this.cameras.main.setBounds(0, 0, 800, 800);
         this.cameras.main.startFollow(tank, true);
-        this.physics.world.setBounds(0, 0, 800, 600 * 3);
+        this.physics.world.setBounds(0, 0, 800, 800);
 
         hpBar = this.add.line(tank.x, tank.y, 0, 20, hpWidth, 20, "0x1f8f00");
         tank.setCollideWorldBounds(true);
+
+        //enemies
         enemies = this.physics.add.group({
-            key: "enemy",
-            repeat: 5,
-            setXY: {x: 100, y: 400, stepX: 50},
             collideWorldBounds: true
         });
+        enemies.create(50, 550, "enemy");
+        enemies.create(50, 500, "enemy");
+        enemies.create(55, 400, "enemy");
+        enemies.create(300, 500, "enemy");
+        enemies.create(300, 400, "enemy");
+        enemies.create(500, 500, "enemy");
+        enemies.create(500, 400, "enemy");
+        enemies.create(750, 400, "enemy");
+        enemies.create(650, 400, "enemy");
+        enemies.create(600, 650, "enemy");
+        enemies.create(600, 750, "enemy");
+        enemies.create(650, 700, "enemy");
         enemies.getChildren().forEach((enemy, i) => {
             enemy.hpBar = this.add.line(enemy.x, enemy.y, 0, 20, hpWidth, 20, "0x870000");
             enemy.hpValue = 100;
@@ -103,27 +117,37 @@
         hpText = this.add.text(700, 550, `Hp: ${hpValue}`, { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
 
         //buttons
-        let button_1 = this.physics.add.sprite(350, 1700, "button_1");
-        let button_2 = this.physics.add.sprite(700, 1500, "button_2");
-        let button_3 = this.physics.add.sprite(700, 1700, "button_3");
+        let button_1 = this.physics.add.sprite(350, 700, "button_1");
+        let button_2 = this.physics.add.sprite(700, 500, "button_2");
+        let button_3 = this.physics.add.sprite(700, 700, "button_3");
+        let button_4 = this.physics.add.sprite(90, 70, "button_4");
+        button_1.depth = -1;
+        button_2.depth = -1;
+        button_3.depth = -1;
+        button_4.depth = -1;
 
         //walls
         walls = this.physics.add.staticGroup();
-        walls.create(175, 1600, "350_32_block");
-        walls.create(600, 1600, "400_32_block");
-        walls.create(600, 1500, "32_184_block");
-        walls.create(425, 1300, "750_32_block");
-        walls.create(375, 1600, "50_32_block_1");
-        walls.create(450, 1708, "32_184_block_2");
-        walls.create(25, 1300, "50_32_block_3");
+        walls.create(175, 600, "350_32_block");
+        walls.create(600, 600, "400_32_block");
+        walls.create(600, 500, "32_184_block");
+        walls.create(425, 300, "750_32_block");
+        walls.create(375, 600, "50_32_block_1");
+        walls.create(450, 708, "32_184_block_2");
+        walls.create(25, 300, "50_32_block_3");
+        walls.create(200, 400, "32_184_block");
+        walls.create(200, 90, "32_184_block");
+        walls.create(500, 90, "32_184_block");
+        walls.create(350, 70, "268_32_block_4");
 
-        this.physics.add.collider(tank, walls);
+        //this.physics.add.collider(tank, walls);
         this.physics.add.collider(enemies, walls);
         this.physics.add.collider(enemies, enemies);
         this.physics.add.collider(tank, enemies);
         this.physics.add.collider(tank, button_1, (tank, btn) => { buttonsCollider(tank, btn, "button_1_active", "block_1", this); });
         this.physics.add.collider(tank, button_2, (tank, btn) => { buttonsCollider(tank, btn, "button_2_active", "block_2", this); });
         this.physics.add.collider(tank, button_3, (tank, btn) => { buttonsCollider(tank, btn, "button_3_active", "block_3", this); });
+        this.physics.add.collider(tank, button_4, (tank, btn) => { buttonsCollider(tank, btn, "button_4_active", "block_4", this); });
 
         this.anims.create({
             key: 'move',
@@ -182,7 +206,7 @@
             let isOnlyRight = isRight && !isUp && !isLeft && !isDown;
 
             enemies.getChildren().forEach((enemy) => {
-                if (Math.random() <= 0.01) fire(enemy, this, true);
+                if (Math.random() <= 0.02) fire(enemy, this, true);
                 if (Math.random() <= 0.1) {
                     let r = Math.random();
                     enemy.setVelocity(0, 0);
