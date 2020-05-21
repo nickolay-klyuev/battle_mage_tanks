@@ -45,7 +45,12 @@
     let playerMoveSpeed = 200;
     let playerDamage = 30;
     let fireSpeed = 300;
+
+    //game over
+    let isGoalCompleted = false;
     let gameOver = false;
+
+
     let hpValue = 100;
     let hpText;
     let hpBar;
@@ -66,6 +71,7 @@
         this.load.image("32_184_block_2", "./sprites/32_184_block_2.png");
         this.load.image("50_32_block_3", "./sprites/50_32_block_3.png");
         this.load.image("268_32_block_4", "./sprites/268_32_block_4.png");
+        this.load.image("184_32_block_5", "./sprites/184_32_block_5.png");
         this.load.image("button_1", "./sprites/button_1.png");
         this.load.image("button_1_active", "./sprites/button_1_active.png");
         this.load.image("button_2", "./sprites/button_2.png");
@@ -74,8 +80,11 @@
         this.load.image("button_3_active", "./sprites/button_3_active.png");
         this.load.image("button_4", "./sprites/button_4.png");
         this.load.image("button_4_active", "./sprites/button_4_active.png");
+        this.load.image("button_5", "./sprites/button_5.png");
+        this.load.image("button_5_active", "./sprites/button_5_active.png");
         this.load.image("enemy", "./sprites/enemy.png");
         this.load.image("fireball", "./sprites/fireball.png");
+        this.load.image("goal", "./sprites/goal.png");
     }
 
     function create() {
@@ -105,6 +114,13 @@
         enemies.create(600, 650, "enemy");
         enemies.create(600, 750, "enemy");
         enemies.create(650, 700, "enemy");
+        enemies.create(50, 100, "enemy");
+        enemies.create(150, 100, "enemy");
+        enemies.create(300, 150, "enemy");
+        enemies.create(400, 150, "enemy");
+        enemies.create(600, 150, "enemy");
+        enemies.create(700, 150, "enemy");
+        enemies.create(600, 50, "enemy");
         enemies.getChildren().forEach((enemy, i) => {
             enemy.hpBar = this.add.line(enemy.x, enemy.y, 0, 20, hpWidth, 20, "0x870000");
             enemy.hpValue = 100;
@@ -121,10 +137,12 @@
         let button_2 = this.physics.add.sprite(700, 500, "button_2");
         let button_3 = this.physics.add.sprite(700, 700, "button_3");
         let button_4 = this.physics.add.sprite(90, 70, "button_4");
+        let button_5 = this.physics.add.sprite(700, 80, "button_5");
         button_1.depth = -1;
         button_2.depth = -1;
         button_3.depth = -1;
         button_4.depth = -1;
+        button_5.depth = -1;
 
         //walls
         walls = this.physics.add.staticGroup();
@@ -139,8 +157,11 @@
         walls.create(200, 90, "32_184_block");
         walls.create(500, 90, "32_184_block");
         walls.create(350, 70, "268_32_block_4");
+        walls.create(92, 166, "184_32_block_5");
 
-        //this.physics.add.collider(tank, walls);
+        let goal = this.physics.add.sprite(350, 25, "goal");
+
+        this.physics.add.collider(tank, walls);
         this.physics.add.collider(enemies, walls);
         this.physics.add.collider(enemies, enemies);
         this.physics.add.collider(tank, enemies);
@@ -148,6 +169,8 @@
         this.physics.add.collider(tank, button_2, (tank, btn) => { buttonsCollider(tank, btn, "button_2_active", "block_2", this); });
         this.physics.add.collider(tank, button_3, (tank, btn) => { buttonsCollider(tank, btn, "button_3_active", "block_3", this); });
         this.physics.add.collider(tank, button_4, (tank, btn) => { buttonsCollider(tank, btn, "button_4_active", "block_4", this); });
+        this.physics.add.collider(tank, button_5, (tank, btn) => { buttonsCollider(tank, btn, "button_5_active", "block_5", this); });
+        this.physics.add.collider(tank, goal, () => { isGoalCompleted = true; });
 
         this.anims.create({
             key: 'move',
@@ -189,11 +212,14 @@
                 hpValue = 100;
                 this.scene.restart();
             }
-        } else if (enemies.getChildren().length == 0) {
+        } else if (isGoalCompleted) {
             this.add.text(300, 250, 'You are winner', { fontSize: '20px', fill: '#000000' }).setScrollFactor(0);
             this.add.text(300, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#000000' }).setScrollFactor(0);
             this.physics.pause();
-            if (isEnter) this.scene.restart();
+            if (isEnter) {
+                isGoalCompleted = false;
+                this.scene.restart();
+            }
         } else {
             let isDown = move.down.isDown;
             let isUp = move.up.isDown;
