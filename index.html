@@ -21,12 +21,18 @@
             super("TitleScreen");
         }
 
+        preload() {
+            this.load.image("title_border", "./sprites/title_border.png");
+        }
+
         create() {
             this.add.text(120, 150, "Minimal tanks battle", { fontSize: "48px", fill: "#ffffff" });
+            this.add.text(120, 250, "Press Enter to start", { fontSize: "32px", fill: "#ffffff" });
+            this.add.sprite(400, 300, "title_border");
 
-            this.input.on("pointerup", () => {
+            this.input.keyboard.addKey("ENTER").on("down", () => {
                 this.scene.start("Level_1");
-            }, this);
+            });
         };
     }
 
