@@ -5,7 +5,9 @@ function fire(shooter, that, isEnemy = false) {
         damage: 20
     }
 
-    let fireball = that.physics.add.image(shooter.x, shooter.y, "fireball");
+    let fireball;
+    if (isEnemy) fireball = that.physics.add.image(shooter.x, shooter.y, "fireball_enemy");
+    else fireball = that.physics.add.image(shooter.x, shooter.y, "fireball");
     fireball.angle = shooter.angle;
     let fireDir = fireball.angle;
     if (fireDir == 0) fireball.setVelocityY(0 - fireSpeed);

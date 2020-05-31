@@ -59,6 +59,7 @@
 
         preload() {
             this.load.spritesheet("tank", "./sprites/tank-sprite.png", {frameWidth: 26, frameHeight: 32});
+            this.load.spritesheet("enemy", "./sprites/enemy_sprite.png", {frameWidth: 26, frameHeight: 32});
             this.load.image("350_32_block", "./sprites/350_32_block.png");
             this.load.image("400_32_block", "./sprites/400_32_block.png");
             this.load.image("32_184_block", "./sprites/32_184_block.png");
@@ -78,8 +79,8 @@
             this.load.image("button_4_active", "./sprites/button_4_active.png");
             this.load.image("button_5", "./sprites/button_5.png");
             this.load.image("button_5_active", "./sprites/button_5_active.png");
-            this.load.image("enemy", "./sprites/enemy.png");
             this.load.image("fireball", "./sprites/fireball.png");
+            this.load.image("fireball_enemy", "./sprites/fireball_enemy.png");
             this.load.image("goal", "./sprites/goal.png");
         }
 
@@ -172,7 +173,13 @@
             this.anims.create({
                 key: 'move',
                 frames: this.anims.generateFrameNumbers('tank', { start: 0, end: 4 }),
-                frameRate: 10,
+                frameRate: 20,
+                repeat: -1
+            });
+            this.anims.create({
+                key: 'enemy_move',
+                frames: this.anims.generateFrameNumbers('enemy', { start: 0, end: 4 }),
+                frameRate: 20,
                 repeat: -1
             });
         }
@@ -189,6 +196,7 @@
             this.hpBar.displayWidth = (this.hpValue * this.hpWidth) / 100;
 
             this.enemies.getChildren().forEach((enemy) => {
+                if (this.gameOver || this.isGoalCompleted) enemy.anims.stop("enemy_move");
                 enemy.hpBar.x = enemy.x;
                 enemy.hpBar.y = enemy.y;
                 enemy.hpBar.displayWidth = (enemy.hpValue * this.hpWidth) / 100;
@@ -210,9 +218,10 @@
                     this.scene.restart();
                 }
             } else if (this.isGoalCompleted) {
-                this.add.text(300, 250, 'You are winner', { fontSize: '20px', fill: '#ffffff', backgroundColor: '#000000' }).setScrollFactor(0);
+                this.add.text(300, 250, 'You win', { fontSize: '20px', fill: '#ffffff', backgroundColor: '#000000' }).setScrollFactor(0);
                 this.add.text(300, 270, 'Press ENTER to Restart', { fontSize: '15px', fill: '#ffffff', backgroundColor: '#000000' }).setScrollFactor(0);
                 this.physics.pause();
+                this.tank.anims.stop("move");
                 if (isEnter) {
                     this.isGoalCompleted = false;
                     this.scene.restart();
@@ -232,6 +241,7 @@
                 this.enemies.getChildren().forEach((enemy) => {
                     if (Math.random() <= 0.02) fire(enemy, this, true);
                     if (Math.random() <= 0.1) {
+                        enemy.anims.play("enemy_move", true);
                         let r = Math.random();
                         enemy.setVelocity(0, 0);
                         if (r <= 0.25) {
